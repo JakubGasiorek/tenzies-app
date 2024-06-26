@@ -6,6 +6,9 @@ import Confetti from "react-confetti"
 export default function App() {
   const [dice, setDice] = React.useState(allNewDice())
   const [tenzies, setTenzies] = React.useState(false)
+  const [counter, setCounter] = React.useState(0)
+  const [bestScore, setBestScore] = React.useState(JSON.parse(localStorage.getItem("best")) || 0);
+
 
   React.useEffect(() => {
     const allHeld = dice.every(die => die.isHeld)
@@ -13,6 +16,10 @@ export default function App() {
     const allSameValue = dice.every(die => die.value === firstValue)
     if (allHeld && allSameValue) {
         setTenzies(true)
+        if (counter < bestScore || bestScore === 0) {
+          localStorage.setItem("best", counter);
+          setBestScore(counter);
+        }
     }
   },[dice])
 
@@ -39,9 +46,11 @@ export default function App() {
         ? die
         :generateNewDice()
       }))
+      setCounter(counter + 1)
     }else{
       setDice(allNewDice())
       setTenzies(false)
+      setCounter(0)
     }
   }
 
@@ -72,6 +81,10 @@ export default function App() {
             {diceElements}
         </div>
         <button className="roll-dice" onClick={rollDice}>{tenzies ? "New game" : "Roll"}</button>
+        <div className="score">        
+          <p>Rolls: {counter}</p>
+          <p>Best: {bestScore}</p>
+        </div>
       </main>
   )
 }
